@@ -7,12 +7,19 @@ import compression from 'compression'
 import _ from 'lodash'
 import config from './config'
 import Cosmic from 'cosmicjs'
-const api = Cosmic()
-const bucket = api.bucket({
-  slug: config.COSMIC_BUCKET,
-  read_key: config.COSMIC_READ_KEY,
-  write_key: config.COSMIC_WRITE_KEY
-})
+
+let bucket
+
+if (process.env.NODE_ENV === 'development') {
+  bucket = require('./mock/bucket').default
+} else {
+  const api = Cosmic()
+  bucket = api.bucket({
+    slug: config.COSMIC_BUCKET,
+    read_key: config.COSMIC_READ_KEY,
+    write_key: config.COSMIC_WRITE_KEY
+  })
+}
 const app = express()
 
 app.use(bodyParser.json())
